@@ -1,0 +1,484 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: #f5f5f5;
+  color: #333;
+  padding: 2rem 1rem;
+}
+
+.container {
+  max-width: 680px;
+  margin: 0 auto;
+}
+
+/* Version étroite pour la page de création (formulaire centré) */
+.container--narrow {
+  max-width: 480px;
+}
+
+h1 {
+  font-size: 1.8rem;
+  color: #1a1a1a;
+}
+
+/* ── En-tête de page (titre + bouton "Nouvelle tâche") ───────────────────── */
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  gap: 1rem;
+}
+
+.page-header h1 {
+  margin-bottom: 0;
+}
+
+.btn-new {
+  padding: 0.5rem 1.1rem;
+  background: #4f7ef8;
+  color: #fff;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background 0.2s;
+}
+.btn-new:hover {
+  background: #3a67e0;
+}
+
+.back-link {
+  font-size: 0.9rem;
+  color: #4f7ef8;
+  text-decoration: none;
+}
+.back-link:hover {
+  text-decoration: underline;
+}
+
+/* ── Formulaire de création dédié ────────────────────────────────────────── */
+
+.creation-form {
+  background: #fff;
+  border: 1px solid #e8e8e8;
+  border-radius: 10px;
+  padding: 1.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.field label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #555;
+}
+
+.field .required {
+  color: #e74c3c;
+}
+
+.field input,
+.field select {
+  padding: 0.6rem 0.8rem;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  outline: none;
+  background: #fff;
+  transition: border-color 0.2s;
+}
+
+.field input:focus,
+.field select:focus {
+  border-color: #4f7ef8;
+}
+
+.field-row {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.field-row .field {
+  flex: 1;
+  min-width: 140px;
+}
+
+.error-msg {
+  font-size: 0.85rem;
+  color: #e74c3c;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.btn-submit {
+  padding: 0.6rem 1.4rem;
+  background: #4f7ef8;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-submit:hover {
+  background: #3a67e0;
+}
+
+.btn-cancel {
+  padding: 0.6rem 1.1rem;
+  background: #f0f0f0;
+  color: #555;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-cancel:hover {
+  background: #e0e0e0;
+}
+
+/* ── Formulaire d'ajout ───────────────────────────────────────────────────── */
+
+#add-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.form-row {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+#add-form input,
+#add-form select {
+  flex: 1;
+  min-width: 120px;
+  padding: 0.6rem 0.8rem;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  outline: none;
+  background: #fff;
+  transition: border-color 0.2s;
+}
+
+#add-form input:focus,
+#add-form select:focus {
+  border-color: #4f7ef8;
+}
+
+#add-form button {
+  padding: 0.6rem 1.2rem;
+  background: #4f7ef8;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.2s;
+}
+
+#add-form button:hover {
+  background: #3a67e0;
+}
+
+/* ── Filtres de catégorie ─────────────────────────────────────────────────── */
+
+#category-filters {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.25rem;
+}
+
+.filter-btn {
+  padding: 0.35rem 0.9rem;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  background: #fff;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.filter-btn:hover {
+  border-color: #4f7ef8;
+  color: #4f7ef8;
+}
+
+.filter-btn.active {
+  background: #4f7ef8;
+  border-color: #4f7ef8;
+  color: #fff;
+}
+
+/* ── Liste des tâches ─────────────────────────────────────────────────────── */
+
+#todo-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.todo-item {
+  display: grid;
+  /* Colonnes : badge priorité | contenu principal | sélecteur état | bouton suppr */
+  grid-template-columns: auto 1fr auto auto;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: #fff;
+  border-radius: 8px;
+  border: 1px solid #e8e8e8;
+  border-left-width: 4px; /* La couleur de la bordure gauche indique la priorité */
+  transition: opacity 0.2s;
+}
+
+/* ── États de la tâche ───────────────────────────────────────────────────── */
+
+/* Tâche terminée : légèrement transparente, titre barré */
+.todo-item.state-done {
+  opacity: 0.55;
+}
+.todo-item.state-done .todo-title {
+  text-decoration: line-through;
+  color: #888;
+}
+
+/* Tâche oubliée : très transparente, titre barré en rouge */
+.todo-item.state-forgot {
+  opacity: 0.4;
+}
+.todo-item.state-forgot .todo-title {
+  text-decoration: line-through;
+  color: #c0392b;
+}
+
+/* ── Priorités (bordure gauche colorée) ──────────────────────────────────── */
+
+.todo-item.priority-urgent {
+  border-left-color: #e74c3c; /* Rouge */
+}
+.todo-item.priority-important {
+  border-left-color: #e67e22; /* Orange */
+}
+.todo-item.priority-secondaire {
+  border-left-color: #bdc3c7; /* Gris clair */
+}
+
+/* ── Badge de priorité ───────────────────────────────────────────────────── */
+
+.priority-badge {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+.priority-badge.urgent {
+  background: #fde8e8;
+  color: #c0392b;
+}
+.priority-badge.important {
+  background: #fef0e0;
+  color: #d35400;
+}
+.priority-badge.secondaire {
+  background: #f0f0f0;
+  color: #7f8c8d;
+}
+
+/* ── Contenu principal (titre + description + catégorie) ─────────────────── */
+
+.todo-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0; /* Nécessaire pour que text-overflow fonctionne dans une grid */
+}
+
+.todo-title {
+  font-size: 0.95rem;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.todo-description {
+  font-size: 0.8rem;
+  color: #888;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.todo-category {
+  display: inline-block;
+  font-size: 0.72rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 12px;
+  background: #eef2ff;
+  color: #4f7ef8;
+  white-space: nowrap;
+  width: fit-content;
+}
+
+/* ── Sélecteur d'état ────────────────────────────────────────────────────── */
+
+.state-select {
+  padding: 0.3rem 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  background: #fff;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.state-select:focus {
+  border-color: #4f7ef8;
+}
+
+/* ── Boutons d'action (édition, suppression) ─────────────────────────────── */
+
+.edit-btn,
+.delete-btn {
+  background: none;
+  border: none;
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 0 0.25rem;
+  line-height: 1;
+  transition: color 0.2s;
+  flex-shrink: 0;
+}
+
+.edit-btn {
+  color: #bbb;
+}
+.edit-btn:hover {
+  color: #4f7ef8;
+}
+
+.delete-btn {
+  color: #ccc;
+}
+.delete-btn:hover {
+  color: #e55;
+}
+
+/* ── Formulaire d'édition inline ─────────────────────────────────────────── */
+
+/* Le <li> passe en colonne quand il est en mode édition */
+.todo-item.editing {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  align-items: stretch;
+}
+
+.edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.edit-form-row {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.edit-form input,
+.edit-form select {
+  flex: 1;
+  min-width: 100px;
+  padding: 0.45rem 0.7rem;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  outline: none;
+  background: #fff;
+  transition: border-color 0.2s;
+}
+
+.edit-form input:focus,
+.edit-form select:focus {
+  border-color: #4f7ef8;
+}
+
+.edit-form-actions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
+
+.btn-save {
+  padding: 0.4rem 1rem;
+  background: #4f7ef8;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-save:hover {
+  background: #3a67e0;
+}
+
+.btn-cancel {
+  padding: 0.4rem 1rem;
+  background: #f0f0f0;
+  color: #555;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-cancel:hover {
+  background: #e0e0e0;
+}
+
+/* ── Message liste vide ──────────────────────────────────────────────────── */
+
+.empty-state {
+  text-align: center;
+  color: #aaa;
+  padding: 2rem 0;
+  font-size: 0.95rem;
+}

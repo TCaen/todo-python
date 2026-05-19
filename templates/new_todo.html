@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nouvelle tâche</title>
+  <link rel="stylesheet" href="/static/css/style.css" />
+</head>
+<body>
+  <div class="container container--narrow">
+
+    <div class="page-header">
+      <a href="/" class="back-link">← Retour</a>
+      <h1>Nouvelle tâche</h1>
+    </div>
+
+    <form id="new-todo-form" class="creation-form">
+
+      <div class="field">
+        <label for="input-title">Titre <span class="required">*</span></label>
+        <input type="text" id="input-title" placeholder="Ex : Appeler le client" required autofocus />
+      </div>
+
+      <div class="field">
+        <label for="input-description">Description</label>
+        <input type="text" id="input-description" placeholder="Quelques mots pour préciser la tâche" />
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="input-priority">Priorité</label>
+          <select id="input-priority">
+            <option value="secondaire">Secondaire</option>
+            <option value="important">Important</option>
+            <option value="urgent">Urgent</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="input-category">Catégorie</label>
+          <input type="text" id="input-category" placeholder="Ex : Travail, Maison…" />
+        </div>
+      </div>
+
+      <p id="error-msg" class="error-msg" hidden></p>
+
+      <div class="form-actions">
+        <a href="/" class="btn-cancel">Annuler</a>
+        <button type="submit" class="btn-submit">Créer la tâche</button>
+      </div>
+
+    </form>
+  </div>
+
+  <script type="module" src="/static/js/new_todo.js"></script>
+</body>
+</html>

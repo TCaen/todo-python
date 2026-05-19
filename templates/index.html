@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Todo List</title>
+  <link rel="stylesheet" href="/static/css/style.css" />
+</head>
+<body>
+  <div class="container">
+
+    <div class="page-header">
+      <h1>Ma Todo List</h1>
+      <a href="/todos/new" class="btn-new">+ Nouvelle tâche</a>
+    </div>
+
+    <!-- Boutons de filtre par catégorie (générés dynamiquement par JS) -->
+    <div id="category-filters">
+      <button class="filter-btn active" data-category="all">Toutes</button>
+    </div>
+
+    <!-- Liste des tâches (générée dynamiquement par JS) -->
+    <ul id="todo-list"></ul>
+
+  </div>
+
+  <script type="module" src="/static/js/app.js"></script>
+</body>
+</html>
