@@ -2,7 +2,7 @@
 // app.js — Rendu et événements de l'interface Todo List
 // =============================================================================
 
-import { fetchTodos, fetchCategories, createTodo, updateTodo, deleteTodo } from "./api.js";
+import { fetchTodos, fetchCategories, updateTodo, deleteTodo } from "./api.js";
 
 let currentFilter = "all";
 
@@ -207,18 +207,6 @@ async function refresh() {
 // =============================================================================
 // ÉVÉNEMENTS
 // =============================================================================
-
-document.getElementById("add-form").addEventListener("submit", async (e) => {
-  e.preventDefault();
-  await createTodo({
-    title:       document.getElementById("input-title").value.trim(),
-    description: document.getElementById("input-description").value.trim(),
-    priority:    document.getElementById("input-priority").value,
-    category:    document.getElementById("input-category").value.trim(),
-  });
-  e.target.reset();
-  await refresh();
-});
 
 document.getElementById("todo-list").addEventListener("change", async (e) => {
   if (!e.target.classList.contains("state-select")) return;
