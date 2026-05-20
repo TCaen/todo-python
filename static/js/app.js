@@ -1,16 +1,18 @@
 // =============================================================================
-// app.js — Rendu et événements de l'interface Todo List
+// app.js — Rendu du tableau Kanban et gestion des événements
 // =============================================================================
 
-import { fetchTodos, fetchCategories, createTodo, updateTodo, deleteTodo } from "./api.js";
+import { fetchTodos, fetchCategories, updateTodo, deleteTodo } from "./api.js";
+import { Column } from "./column.js";
 
 let currentFilter = "all";
 
-const STATE_LABELS = {
-  todo:   "À faire",
-  done:   "Terminé",
-  forgot: "Oublié",
-};
+// Définition des 3 colonnes — dans l'ordre d'affichage
+const COLUMN_DEFS = [
+  { state: "todo",   label: "À faire" },
+  { state: "done",   label: "Terminé" },
+  { state: "forgot", label: "Oublié"  },
+];
 
 const PRIORITY_LABELS = {
   urgent:     "Urgent",
@@ -23,13 +25,35 @@ const PRIORITY_LABELS = {
 // RENDU
 // =============================================================================
 
+/**
+ * Construit le tableau Kanban : crée 3 instances de Column,
+ * dispatche chaque tâche dans la colonne correspondant à son state,
+ * puis rend chaque colonne dans #kanban-board.
+ */
+function renderBoard(todos) {
+  const board = document.getElementById("kanban-board");
+  board.innerHTML = "";
+
+  const columns = COLUMN_DEFS.map(
+    def => new Column(def.state, def.label, handleDrop)
+  );
+
+  // Chaque tâche rejoint la colonne dont le state correspond au sien
+  todos.forEach(todo => {
+    const col = columns.find(c => c.state === todo.state);
+    if (col) col.addTodo(todo);
+  });
+
+  columns.forEach(col => board.appendChild(col.render()));
+}
+
 function renderCategories(categories) {
   const container = document.getElementById("category-filters");
   const allBtn = container.querySelector('[data-category="all"]');
   container.innerHTML = "";
   container.appendChild(allBtn);
 
-  categories.forEach((cat) => {
+  categories.forEach(cat => {
     const btn = document.createElement("button");
     btn.className = "filter-btn" + (currentFilter === cat ? " active" : "");
     btn.dataset.category = cat;
@@ -40,105 +64,50 @@ function renderCategories(categories) {
   allBtn.className = "filter-btn" + (currentFilter === "all" ? " active" : "");
 }
 
-function renderTodoView(todo, li) {
-  li.className = `todo-item state-${todo.state} priority-${todo.priority}`;
-
-  const priorityBadge = document.createElement("span");
-  priorityBadge.className = `priority-badge ${todo.priority}`;
-  priorityBadge.textContent = PRIORITY_LABELS[todo.priority];
-
-  const content = document.createElement("div");
-  content.className = "todo-content";
-
-  const title = document.createElement("span");
-  title.className = "todo-title";
-  title.textContent = todo.title;
-  content.appendChild(title);
-
-  if (todo.description) {
-    const desc = document.createElement("span");
-    desc.className = "todo-description";
-    desc.textContent = todo.description;
-    content.appendChild(desc);
-  }
-
-  if (todo.category) {
-    const badge = document.createElement("span");
-    badge.className = "todo-category";
-    badge.textContent = todo.category;
-    content.appendChild(badge);
-  }
-
-  const stateSelect = document.createElement("select");
-  stateSelect.className = "state-select";
-  Object.entries(STATE_LABELS).forEach(([value, label]) => {
-    const option = document.createElement("option");
-    option.value = value;
-    option.textContent = label;
-    option.selected = (value === todo.state);
-    stateSelect.appendChild(option);
-  });
-
-  const editBtn = document.createElement("button");
-  editBtn.className = "edit-btn";
-  editBtn.textContent = "✏️";
-  editBtn.title = "Modifier";
-
-  const deleteBtn = document.createElement("button");
-  deleteBtn.className = "delete-btn";
-  deleteBtn.textContent = "×";
-  deleteBtn.title = "Supprimer";
-
-  li.appendChild(priorityBadge);
-  li.appendChild(content);
-  li.appendChild(stateSelect);
-  li.appendChild(editBtn);
-  li.appendChild(deleteBtn);
-}
-
-function renderEditForm(todo, li) {
-  li.className = "todo-item editing";
-  li.innerHTML = "";
+/**
+ * Remplace le contenu d'une carte par un formulaire d'édition inline.
+ * Enregistrer → appel API + refresh. Annuler → refresh sans sauvegarder.
+ *
+ * @param {object}      todo - données actuelles de la tâche
+ * @param {HTMLElement} card - la carte à transformer
+ */
+function renderEditForm(todo, card) {
+  card.draggable = false; // désactive le drag pendant l'édition
+  card.innerHTML = "";
+  card.classList.add("editing");
 
   const form = document.createElement("div");
   form.className = "edit-form";
-
-  const row1 = document.createElement("div");
-  row1.className = "edit-form-row";
 
   const inputTitle = document.createElement("input");
   inputTitle.type = "text";
   inputTitle.value = todo.title;
   inputTitle.placeholder = "Titre";
-  inputTitle.required = true;
 
   const inputDesc = document.createElement("input");
   inputDesc.type = "text";
   inputDesc.value = todo.description || "";
-  inputDesc.placeholder = "Description (optionnel)";
+  inputDesc.placeholder = "Description";
 
-  row1.appendChild(inputTitle);
-  row1.appendChild(inputDesc);
-
-  const row2 = document.createElement("div");
-  row2.className = "edit-form-row";
+  const row = document.createElement("div");
+  row.className = "edit-form-row";
 
   const selectPriority = document.createElement("select");
   Object.entries(PRIORITY_LABELS).forEach(([value, label]) => {
-    const option = document.createElement("option");
-    option.value = value;
-    option.textContent = label;
-    option.selected = (value === todo.priority);
-    selectPriority.appendChild(option);
+    const opt = document.createElement("option");
+    opt.value = value;
+    opt.textContent = label;
+    opt.selected = value === todo.priority;
+    selectPriority.appendChild(opt);
   });
 
   const inputCategory = document.createElement("input");
   inputCategory.type = "text";
   inputCategory.value = todo.category || "";
-  inputCategory.placeholder = "Catégorie (optionnel)";
+  inputCategory.placeholder = "Catégorie";
 
-  row2.appendChild(selectPriority);
-  row2.appendChild(inputCategory);
+  row.appendChild(selectPriority);
+  row.appendChild(inputCategory);
 
   const actions = document.createElement("div");
   actions.className = "edit-form-actions";
@@ -155,10 +124,10 @@ function renderEditForm(todo, li) {
     const newTitle = inputTitle.value.trim();
     if (!newTitle) { inputTitle.focus(); return; }
     await updateTodo(todo.id, {
-      title: newTitle,
+      title:       newTitle,
       description: inputDesc.value.trim(),
-      priority: selectPriority.value,
-      category: inputCategory.value.trim(),
+      priority:    selectPriority.value,
+      category:    inputCategory.value.trim(),
     });
     await refresh();
   });
@@ -167,31 +136,13 @@ function renderEditForm(todo, li) {
 
   actions.appendChild(btnSave);
   actions.appendChild(btnCancel);
-  form.appendChild(row1);
-  form.appendChild(row2);
+
+  form.appendChild(inputTitle);
+  form.appendChild(inputDesc);
+  form.appendChild(row);
   form.appendChild(actions);
-  li.appendChild(form);
+  card.appendChild(form);
   inputTitle.focus();
-}
-
-function renderTodos(todos) {
-  const list = document.getElementById("todo-list");
-  list.innerHTML = "";
-
-  if (todos.length === 0) {
-    const empty = document.createElement("p");
-    empty.className = "empty-state";
-    empty.textContent = "Aucune tâche pour le moment.";
-    list.appendChild(empty);
-    return;
-  }
-
-  todos.forEach((todo) => {
-    const li = document.createElement("li");
-    li.dataset.id = todo.id;
-    renderTodoView(todo, li);
-    list.appendChild(li);
-  });
 }
 
 async function refresh() {
@@ -199,55 +150,51 @@ async function refresh() {
     fetchTodos(currentFilter),
     fetchCategories(),
   ]);
-  renderTodos(todos);
+  renderBoard(todos);
   renderCategories(categories);
 }
 
 
 // =============================================================================
-// ÉVÉNEMENTS
+// CALLBACKS & ÉVÉNEMENTS
 // =============================================================================
 
-document.getElementById("add-form").addEventListener("submit", async (e) => {
-  e.preventDefault();
-  await createTodo({
-    title:       document.getElementById("input-title").value.trim(),
-    description: document.getElementById("input-description").value.trim(),
-    priority:    document.getElementById("input-priority").value,
-    category:    document.getElementById("input-category").value.trim(),
-  });
-  e.target.reset();
+/**
+ * Appelé par Column quand une carte est déposée dans une nouvelle colonne.
+ * Met à jour le state côté serveur (→ todos.json) puis rafraîchit le board.
+ *
+ * @param {string} todoId      - UUID de la tâche déplacée
+ * @param {string} sourceState - colonne d'origine
+ * @param {string} targetState - colonne de destination
+ */
+async function handleDrop(todoId, _sourceState, targetState) {
+  await updateTodo(todoId, { state: targetState });
   await refresh();
-});
+}
 
-document.getElementById("todo-list").addEventListener("change", async (e) => {
-  if (!e.target.classList.contains("state-select")) return;
-  const id = e.target.closest(".todo-item").dataset.id;
-  await updateTodo(id, { state: e.target.value });
-  await refresh();
-});
+// Délégation sur le board pour éditer et supprimer les cartes
+document.getElementById("kanban-board").addEventListener("click", async (e) => {
+  const card = e.target.closest(".kanban-card");
+  if (!card) return;
 
-document.getElementById("todo-list").addEventListener("click", async (e) => {
-  const li = e.target.closest(".todo-item");
-  if (!li) return;
-
-  if (e.target.classList.contains("edit-btn")) {
+  if (e.target.dataset.action === "edit") {
     const todos = await fetchTodos(currentFilter);
-    const todo = todos.find((t) => t.id === li.dataset.id);
-    if (todo) renderEditForm(todo, li);
+    const todo = todos.find(t => t.id === card.dataset.id);
+    if (todo) renderEditForm(todo, card);
     return;
   }
 
-  if (e.target.classList.contains("delete-btn")) {
-    await deleteTodo(li.dataset.id);
+  if (e.target.dataset.action === "delete") {
+    await deleteTodo(card.dataset.id);
     await refresh();
   }
 });
 
+// Filtre par catégorie
 document.getElementById("category-filters").addEventListener("click", async (e) => {
   if (!e.target.classList.contains("filter-btn")) return;
   currentFilter = e.target.dataset.category;
-  document.querySelectorAll(".filter-btn").forEach((b) => b.classList.remove("active"));
+  document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
   e.target.classList.add("active");
   await refresh();
 });
